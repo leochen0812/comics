@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動漫與多媒體互動教學網頁</title>
+<style>
+  :root {
+    --primary: #6c63ff;
+    --secondary: #ff6584;
+    --accent: #43b89c;
+    --bg: #f7f8fc;
+    --card: #ffffff;
+    --text: #2d2d2d;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* NAV */
+  nav {
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 60px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  nav .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+  nav .nav-links { display: flex; gap: 1.5rem; }
+  nav .nav-links a {
+    color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.95rem;
+    padding: 4px 8px; border-radius: 6px; transition: background 0.2s;
+  }
+  nav .nav-links a:hover { background: rgba(255,255,255,0.2); color: white; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #6c63ff 0%, #43b89c 100%);
+    color: white; text-align: center; padding: 4rem 2rem 3rem;
+  }
+  .hero h1 { font-size: 2.4rem; margin-bottom: 0.8rem; }
+  .hero p { font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto 1.5rem; }
+  .hero-chips { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+  .chip {
+    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px; padding: 4px 14px; font-size: 0.85rem;
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex; justify-content: center; gap: 0.5rem;
+    background: white; padding: 1rem; border-bottom: 1px solid var(--border);
+    position: sticky; top: 60px; z-index: 90; flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 8px 20px; border: 2px solid var(--border); border-radius: 25px;
+    background: white; cursor: pointer; font-size: 0.95rem; color: var(--muted);
+    transition: all 0.2s; font-family: inherit;
+  }
+  .tab-btn.active, .tab-btn:hover {
+    background: var(--primary); border-color: var(--primary); color: white;
+  }
+
+  /* SECTIONS */
+  .section { display: none; max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card); border-radius: 12px; padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem;
+    border-left: 4px solid var(--primary);
+  }
+  .card h3 { color: var(--primary); margin-bottom: 0.8rem; font-size: 1.15rem; }
+  .card p, .card li { line-height: 1.8; color: var(--text); }
+  .card ul { padding-left: 1.2rem; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; }
+  .card-sm {
+    background: var(--card); border-radius: 10px; padding: 1.2rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07); border-top: 3px solid var(--accent);
+  }
+  .card-sm h4 { color: var(--accent); margin-bottom: 0.5rem; }
+  .card-sm p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before {
+    content: ''; position: absolute; left: 12px; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .tl-item { position: relative; margin-bottom: 1.5rem; }
+  .tl-dot {
+    position: absolute; left: -1.65rem; top: 4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--primary); border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+  .tl-year {
+    display: inline-block; background: var(--primary); color: white;
+    font-size: 0.8rem; border-radius: 4px; padding: 2px 8px; margin-bottom: 4px;
+  }
+  .tl-content { background: white; border-radius: 8px; padding: 0.8rem 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .tl-content p { font-size: 0.92rem; line-height: 1.7; }
+
+  /* PROCESS STEPS */
+  .steps { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .step {
+    flex: 1 1 140px; background: white; border-radius: 10px; padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07); text-align: center;
+    border-bottom: 3px solid var(--secondary); position: relative;
+  }
+  .step-num {
+    width: 32px; height: 32px; background: var(--secondary); color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; margin: 0 auto 0.5rem; font-size: 0.9rem;
+  }
+  .step h4 { font-size: 0.9rem; color: var(--text); }
+  .step p { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
+
+  /* AI TOOLS TABLE */
+  .ai-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .ai-table th {
+    background: var(--primary); color: white; padding: 10px 12px;
+    text-align: left; font-weight: 600;
+  }
+  .ai-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .ai-table tr:hover td { background: #f0edff; }
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .tag-video { background: #fce7f3; color: #be185d; }
+  .tag-image { background: #e0f2fe; color: #0369a1; }
+  .tag-audio { background: #dcfce7; color: #15803d; }
+  .tag-music { background: #fef9c3; color: #854d0e; }
+  .tag-story { background: #ede9fe; color: #6d28d9; }
+  .tag-edit { background: #fee2e2; color: #991b1b; }
+
+  /* QUIZ */
+  .quiz-card {
+    background: white; border-radius: 12px; padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 1.5rem;
+  }
+  .quiz-q { font-weight: 600; margin-bottom: 1rem; font-size: 1rem; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-opt {
+    padding: 10px 14px; border: 2px solid var(--border); border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; font-size: 0.92rem;
+    background: white; text-align: left; font-family: inherit;
+  }
+  .quiz-opt:hover { border-color: var(--primary); background: #f0edff; }
+  .quiz-opt.correct { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+  .quiz-opt.wrong { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+  .quiz-feedback { margin-top: 0.8rem; font-size: 0.9rem; display: none; padding: 8px 12px; border-radius: 6px; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: #dcfce7; color: #15803d; }
+  .quiz-feedback.no { background: #fee2e2; color: #991b1b; }
+  .quiz-score {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white; border-radius: 12px; padding: 1.5rem; text-align: center;
+    display: none; margin-top: 1rem;
+  }
+  .quiz-score.show { display: block; }
+  .quiz-score h3 { font-size: 1.5rem; }
+  #submit-quiz {
+    background: var(--primary); color: white; border: none; padding: 12px 28px;
+    border-radius: 25px; font-size: 1rem; cursor: pointer; margin-top: 1rem;
+    font-family: inherit; transition: background 0.2s;
+  }
+  #submit-quiz:hover { background: #5a52e0; }
+
+  /* SECTION TITLE */
+  .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+  .section-sub { color: var(--muted); margin-bottom: 1.8rem; font-size: 0.95rem; }
+  .badge {
+    display: inline-block; background: var(--primary); color: white;
+    font-size: 0.75rem; border-radius: 4px; padding: 2px 8px; margin-right: 4px; vertical-align: middle;
+  }
+
+  /* FORMAT TABLE */
+  .fmt-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .fmt-table th { background: var(--accent); color: white; padding: 8px 12px; text-align: left; }
+  .fmt-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .fmt-table tr:nth-child(even) td { background: #f7fffe; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.6rem; }
+    nav .nav-links { display: none; }
+    .steps { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🎨 動漫與多媒體</div>
+  <div class="nav-links">
+    <a href="#" onclick="showTab('ch1')">動漫概念</a>
+    <a href="#" onclick="showTab('ch2')">電腦繪圖</a>
+    <a href="#" onclick="showTab('ch3')">產製流程</a>
+    <a href="#" onclick="showTab('ai')">AI工具</a>
+    <a href="#" onclick="showTab('quiz')">隨堂測驗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>🎬 動漫與多媒體概論</h1>
+  <p>整合動漫概念、電腦繪圖、日本動畫產製流程與 AI 創作工具的互動教學資源</p>
+  <div class="hero-chips">
+    <span class="chip">📖 動漫概念</span>
+    <span class="chip">🖥️ 電腦繪圖</span>
+    <span class="chip">🎞️ 產製流程</span>
+    <span class="chip">🤖 AI工具</span>
+    <span class="chip">✅ 隨堂測驗</span>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('ch1')">第1章｜動漫概念</button>
+  <button class="tab-btn" onclick="showTab('ch2')">第2章｜電腦繪圖</button>
+  <button class="tab-btn" onclick="showTab('ch3')">第3章｜產製流程</button>
+  <button class="tab-btn" onclick="showTab('ai')">AI創作工具</button>
+  <button class="tab-btn" onclick="showTab('quiz')">✏️ 隨堂測驗</button>
+</div>
+
+<!-- CH1: 動漫概念 -->
+<div id="ch1" class="section active">
+  <div class="section-title">第一章｜動漫概念</div>
+  <div class="section-sub">了解動漫、卡通、漫畫的定義與分類，以及 2D/3D 動畫技術發展。</div>
+
+  <div class="card-grid">
+    <div class="card-sm">
+      <h4>🎭 動漫 Animation &amp; Comics</h4>
+      <p>泛指動畫（Animation）與漫畫（Comics）的合稱，是以視覺敘事為核心的創作形式。</p>
+    </div>
+    <div class="card-sm">
+      <h4>😄 卡通 Cartoon</h4>
+      <p>以誇張、幽默手法表現的繪畫形式，包含 Caricature（諷刺畫）到動畫短片。</p>
+    </div>
+    <div class="card-sm">
+      <h4>📖 漫畫 Comics</h4>
+      <p>以連續圖格（Comic Strip）說故事的視覺藝術，Scott McCloud《Understanding Comics》定義其為「連續藝術」。</p>
+    </div>
+    <div class="card-sm">
+      <h4>➡️ 動態線 Motion Line</h4>
+      <p>漫畫中表現速度與動感的線條技法，是視覺敘事的重要元素之一。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🖼️ 2D vs 3D 動畫比較</h3>
+    <div style="overflow-x:auto">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+      <tr style="background:#f0edff">
+        <th style="padding:10px; text-align:left; border-bottom:2px solid var(--primary)">比較項目</th>
+        <th style="padding:10px; text-align:left; border-bottom:2px solid var(--primary)">2D 動畫</th>
+        <th style="padding:10px; text-align:left; border-bottom:2px solid var(--primary)">3D 動畫</th>
+      </tr>
+      <tr>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">表現方式</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">平面逐格繪製</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">立體模型建構</td>
+      </tr>
+      <tr>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">代表軟體</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">Flash / Animate</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">3ds Max / Maya / Blender</td>
+      </tr>
+      <tr>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">製作流程</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">原畫→動畫→上色</td>
+        <td style="padding:10px; border-bottom:1px solid var(--border)">Modeling→Shading→Animation→Render</td>
+      </tr>
+      <tr>
+        <td style="padding:10px">視覺風格</td>
+        <td style="padding:10px">手繪感、平面</td>
+        <td style="padding:10px">立體真實感</td>
+      </tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📅 AI 動畫發展時間軸</h3>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-year">2014–2018</span>
+        <div class="tl-content"><p>GAN（生成對抗網路）問世，奠定 AI 圖像生成基礎。2017–2018 年開始出現 AI 輔助創作工具雛形。</p></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-year">2019–2021</span>
+        <div class="tl-content"><p>AI 圖像生成技術逐漸成熟，開始在 Bilibili 等平台出現 AI 繪圖作品。</p></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-year">2022</span>
+        <div class="tl-content"><p>Stable Diffusion、MidJourney、DALL·E 2 相繼推出，AI 繪圖進入大眾化時代。行動 App 整合 AI 圖像生成功能。</p></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-year">2023–2024</span>
+        <div class="tl-content"><p>AI 動畫工具爆發，After Effects、Blender 整合 AI 功能；Runway、Hailuo 等 AI 影片生成平台興起。</p></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <span class="tl-year">2024–2025</span>
+        <div class="tl-content"><p>ChatGPT 與生成式 AI 全面滲透動漫產業，Google Veo 3、OpenAI Sora 等高品質影片生成工具問世。</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CH2: 電腦繪圖 -->
+<div id="ch2" class="section">
+  <div class="section-title">第二章｜電腦繪圖與多媒體</div>
+  <div class="section-sub">掌握色彩模式、檔案格式、常用軟體與多媒體規格等基礎知識。</div>
+
+  <div class="card-grid">
+    <div class="card-sm">
+      <h4>🎨 色彩位元深度</h4>
+      <p><b>1 bit</b> = 2 色（黑白）<br><b>8 bit</b> = 256 色<br><b>16 bit</b> = 65,536 色<br><b>24 bit</b> = 16,777,216 色（全彩 RGB）</p>
+    </div>
+    <div class="card-sm">
+      <h4>🖨️ RGB vs CMYK</h4>
+      <p><b>RGB</b>：螢幕顯示，加法混色，72 ppi<br><b>CMYK</b>：印刷用途，減法混色，300 ppi</p>
+    </div>
+    <div class="card-sm">
+      <h4>📐 向量 vs 點陣</h4>
+      <p><b>向量</b>：Illustrator / CorelDRAW，縮放不失真（.ai / .svg）<br><b>點陣</b>：Photoshop，以像素構成（.jpg / .png / .gif）</p>
+    </div>
+    <div class="card-sm">
+      <h4>🎬 影像規格</h4>
+      <p><b>NTSC</b>：30 fps，525 lines（北美/日本）<br><b>PAL</b>：25 fps，625 lines（歐洲/台灣）</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📁 多媒體格式速查表</h3>
+    <div style="overflow-x:auto">
+    <table class="fmt-table">
+      <tr><th>類型</th><th>格式</th><th>說明</th></tr>
+      <tr><td>📷 點陣圖</td><td>JPG / PNG / GIF / BMP / TIFF</td><td>JPG 高壓縮失真小；PNG 支援透明背景；GIF 動態但限 256 色；TIFF 無損高品質，適合印刷</td></tr>
+      <tr><td>✏️ 向量圖</td><td>AI / SVG / CDR / EMF</td><td>可無限縮放不失真，適合 Logo 設計；WMF 為混合格式（含向量與點陣），已由 EMF 取代</td></tr>
+      <tr><td>🎵 音訊</td><td>WAV / MP3 / MIDI / WMA</td><td>WAV 無損；MP3 高壓縮但失真程度小，適合網路傳輸；MIDI 為樂器演奏指令非音訊錄音</td></tr>
+      <tr><td>🎬 影片</td><td>MP4 / AVI / MOV / WMV / RM</td><td>MP4 高壓縮失真程度小，為最通用格式；MOV 為 Apple QuickTime 格式；AVI 為 Windows 原生格式</td></tr>
+      <tr><td>🗜️ 壓縮標準</td><td>MPEG-1 / MPEG-2 / MPEG-4</td><td>MPEG-1 用於 VCD；MPEG-2 用於 DVD；MPEG-4 廣泛用於網路串流、行動裝置與數位電視</td></tr>
+    </table>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- CH3: 產製流程 -->
+<div id="ch3" class="section">
+  <div class="section-title">第三章｜日本動畫產製流程</div>
+  <div class="section-sub">日本動畫產製分為「製前作業」、「製作中心作業」、「製後作業」與「試映」四大階段。</div>
+
+  <div class="card-grid" style="margin-bottom:1.5rem">
+    <div class="card-sm" style="border-top-color:#6c63ff">
+      <h4>📋 製前作業</h4>
+      <p>企劃、製作經費規劃、腳本撰寫、導演確立、分鏡圖製作、人物設計、機械與背景設計、色彩設計</p>
+    </div>
+    <div class="card-sm" style="border-top-color:#ff6584">
+      <h4>🎨 製作中心作業</h4>
+      <p>構圖、原畫、原畫指導、動畫師補畫、著色上色、特效處理、攝影合成、剪接</p>
+    </div>
+    <div class="card-sm" style="border-top-color:#43b89c">
+      <h4>🎙️ 製後作業</h4>
+      <p>人物配音（聲優錄音）、音樂製作、音效製作（人造音／環境音／生音）、影音合成</p>
+    </div>
+    <div class="card-sm" style="border-top-color:#f59e0b">
+      <h4>🎬 試映</h4>
+      <p>影音合成後於視聽室進行第一次試映，作最後錯誤檢視，並邀請業界人士觀看以利宣傳。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 製前作業詳解</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:1rem; margin-top:0.5rem">
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">1. 企劃</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">分為<b>原作</b>（漫畫、電玩、小說改編）與<b>原案</b>（原創）。提案流程：企劃 → 動畫公司 → 贊助商。原作企劃因有固定客群，較易獲得贊助。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">2. 製作經費</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">理論上「預估營收 = 製作經費」。主要職位：動畫導演、人物造型設計師、分鏡圖人員、主鏡／基層動畫師、音樂設計、色稿人員、編輯、包裝設計等。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">3. 腳本</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">一般動畫公司無專屬腳本作家，由自由作家或工作室撰寫。<b>製作人</b>是作品成敗的負責人，對腳本有最終修改決定權。好的小說家不一定能寫出好腳本。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">4. 導演職責</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">導演是製作群領隊。製前敲定腳本與設計稿；製中指導各集方向；製後編輯影片並指導聲優錄音；同時參與所有宣傳活動。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">5. 分鏡圖與副導</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">分鏡圖是「以圖像呈現的腳本」，不需精確畫出人物造型，能看懂即可。分鏡圖師與副導演常為同一人，最了解每個鏡頭所需效果。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">6. 人物設計</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">設計圖分三種：服飾設計圖、臉部表情設計圖、局部裝飾設計圖。另備正面、側面、背面三視圖供原畫師參考。改編作品須簡化線條以提升製作效率。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">7. 機械與背景設計</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">機械造型設計師需具備工業設計知識，設計符合動畫製作的線條。背景設計師要求「又好、又快、又美」。</p>
+      </div>
+      <div style="background:#f8f7ff; border-radius:8px; padding:1rem">
+        <b style="color:#6c63ff">8. 色彩設計</b>
+        <p style="font-size:0.88rem; margin-top:0.4rem; line-height:1.7">導演、造型設計師與色彩設計師共同敲定人物配色。基本顏色確立後，其他光線情境下的顏色由配色人員與副導演詳細設定。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🎨 製作中心作業詳解</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h4>構圖</h4><p>將所有素材放在一起，畫出放大的詳細分鏡圖供後續使用</p></div>
+      <div class="step"><div class="step-num">2</div><h4>原畫師</h4><p>按構圖畫出更詳細的主鏡畫面（Key Frame）</p></div>
+      <div class="step"><div class="step-num">3</div><h4>原畫指導</h4><p>依設計稿修正各原畫師的原畫稿，統一整體畫風</p></div>
+      <div class="step"><div class="step-num">4</div><h4>動畫師</h4><p>清理原畫線條，補畫主鏡之間的分格動作（In-between）；完稿須經動畫檢查人員確認</p></div>
+      <div class="step"><div class="step-num">5</div><h4>著色人員</h4><p>按色彩設計要求上色；數位化後用掃描機將線稿數位化再清線上色</p></div>
+      <div class="step"><div class="step-num">6</div><h4>特效人員</h4><p>三種方式：背景直接畫上特效、電腦軟體加特效、攝影效果產生特效</p></div>
+      <div class="step"><div class="step-num">7</div><h4>攝影合成</h4><p>將動畫稿與背景合成；數位化後以電腦軟體處理；動畫公司製程到此結束</p></div>
+      <div class="step"><div class="step-num">8</div><h4>剪接</h4><p>導演、副導與剪接人員依分鏡圖進行剪接作業</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🎙️ 製後作業：配音三要素</h3>
+    <div class="card-grid">
+      <div class="card-sm" style="border-top-color:#6c63ff">
+        <h4>🗣️ 人物配音</h4>
+        <p>聲優由導演、音響指導和贊助商共同決定。錄音現場通常有製作人、製作管理、導演、音響指導及副導共同參與。</p>
+      </div>
+      <div class="card-sm" style="border-top-color:#ff6584">
+        <h4>🎵 音樂製作</h4>
+        <p>音樂製作人員須事先和導演開會了解所需氛圍感，可直接收錄演奏或電腦混音，視預算決定。<b>原聲 CD 銷售</b>也是動畫的重要收入來源。</p>
+      </div>
+      <div class="card-sm" style="border-top-color:#43b89c">
+        <h4>🔊 音效製作</h4>
+        <p>製作順序：收集 → 編集 → 混音 → 錄音 → 確認 → 保存。分三類：<b>人造音</b>（音效師創造）、<b>環境音</b>（場景周圍聲音）、<b>生音</b>（人物動作產生的聲音）。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI TOOLS -->
+<div id="ai" class="section">
+  <div class="section-title">AI 創作工具總覽</div>
+  <div class="section-sub">整合課程中提及的 AI 輔助創作工具，依功能分類整理。</div>
+
+  <div class="card">
+    <h3>🤖 AI 工具分類一覽</h3>
+    <div style="overflow-x:auto">
+    <table class="ai-table">
+      <tr><th>工具名稱</th><th>功能類型</th><th>特色說明</th></tr>
+      <tr><td><b>Runway Gen-4</b></td><td><span class="tag tag-video">影片生成</span></td><td>文字/圖像轉影片，專業級 AI 影片生成平台</td></tr>
+      <tr><td><b>Hailuo Motion</b></td><td><span class="tag tag-video">影片生成</span></td><td>中國 MiniMax 出品，支援高品質影片生成</td></tr>
+      <tr><td><b>OpenAI Sora</b></td><td><span class="tag tag-video">影片生成</span></td><td>OpenAI 出品，可生成長達數分鐘的高畫質影片</td></tr>
+      <tr><td><b>Google Veo 3</b></td><td><span class="tag tag-video">影片生成</span></td><td>Google DeepMind 出品，畫質與物理模擬優秀</td></tr>
+      <tr><td><b>Midjourney</b></td><td><span class="tag tag-image">圖像生成</span></td><td>藝術風格圖像生成，畫質細膩，廣受設計師喜愛</td></tr>
+      <tr><td><b>Stable Diffusion</b></td><td><span class="tag tag-image">圖像生成</span></td><td>開源模型，可本地部署，高度客製化</td></tr>
+      <tr><td><b>Adobe Firefly</b></td><td><span class="tag tag-image">圖像生成</span></td><td>Adobe 生態整合，Photoshop/Express 內建</td></tr>
+      <tr><td><b>Canva AI</b></td><td><span class="tag tag-image">圖像生成</span></td><td>介面簡單，適合非設計背景使用者快速製作</td></tr>
+      <tr><td><b>ElevenLabs</b></td><td><span class="tag tag-audio">語音合成</span></td><td>高擬真 AI 配音，支援多語言克隆聲音</td></tr>
+      <tr><td><b>TTSmaker</b></td><td><span class="tag tag-audio">語音合成</span></td><td>免費文字轉語音工具，支援繁體中文</td></tr>
+      <tr><td><b>Clipchamp AI</b></td><td><span class="tag tag-edit">影片剪輯</span></td><td>Microsoft 出品，整合 AI 自動剪輯功能</td></tr>
+      <tr><td><b>Suno AI</b></td><td><span class="tag tag-music">音樂生成</span></td><td>輸入歌詞或風格描述即可生成完整歌曲</td></tr>
+      <tr><td><b>Google Storybook</b></td><td><span class="tag tag-story">故事創作</span></td><td>AI 自動生成圖文繪本，教育應用潛力大</td></tr>
+      <tr><td><b>Storybird</b></td><td><span class="tag tag-story">故事創作</span></td><td>兒童繪本與創意寫作 AI 輔助平台</td></tr>
+      <tr><td><b>Nano Banana</b></td><td><span class="tag tag-video">影片生成</span></td><td>ChatGPT 整合的 AI 短影片生成工具</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card-sm">
+      <h4>💡 提示詞工程小技巧</h4>
+      <p>使用 AI 圖像工具時，描述應包含：<b>風格</b>（如 anime style）、<b>場景</b>、<b>光線</b>、<b>構圖</b>、<b>細節</b>，越具體效果越好。</p>
+    </div>
+    <div class="card-sm">
+      <h4>🔧 GPU / RAM 需求</h4>
+      <p>本地端 Stable Diffusion 建議 VRAM 8GB 以上；雲端工具（Midjourney、Runway）則無本地硬體需求，透過瀏覽器即可使用。</p>
+    </div>
+    <div class="card-sm">
+      <h4>🌐 AI 整合趨勢</h4>
+      <p>After Effects 與 Blender 已陸續整合 AI 功能，未來動畫師的工作將從「逐格繪製」轉向「AI 指揮與後製調整」。</p>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="section">
+  <div class="section-title">✏️ 隨堂測驗</div>
+  <div class="section-sub">測試你對三章節內容的理解程度，共 8 題。</div>
+
+  <div id="quiz-container">
+
+    <div class="quiz-card" data-q="0">
+      <div class="quiz-q">1. Scott McCloud 在《Understanding Comics》中，將漫畫定義為哪種藝術形式？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">靜態繪畫藝術</button>
+        <button class="quiz-opt" data-a="1">連續藝術（Sequential Art）</button>
+        <button class="quiz-opt" data-a="2">互動多媒體藝術</button>
+        <button class="quiz-opt" data-a="3">數位敘事藝術</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="1">
+      <div class="quiz-q">2. 24 位元全彩 RGB 色彩模式共可表示多少種顏色？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">256 色</button>
+        <button class="quiz-opt" data-a="1">65,536 色</button>
+        <button class="quiz-opt" data-a="2">16,777,216 色</button>
+        <button class="quiz-opt" data-a="3">4,294,967,296 色</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="2">
+      <div class="quiz-q">3. 以下哪種圖檔格式支援透明背景，且不失真？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">JPG</button>
+        <button class="quiz-opt" data-a="1">GIF</button>
+        <button class="quiz-opt" data-a="2">PNG</button>
+        <button class="quiz-opt" data-a="3">BMP</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="3">
+      <div class="quiz-q">4. NTSC 電視標準的畫面更新率（fps）為何？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">24 fps</button>
+        <button class="quiz-opt" data-a="1">25 fps</button>
+        <button class="quiz-opt" data-a="2">30 fps</button>
+        <button class="quiz-opt" data-a="3">60 fps</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="4">
+      <div class="quiz-q">5. 日本動畫製作流程中，「補充原畫之間中間畫格」的工作由誰負責？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">原畫師（Key Animator）</button>
+        <button class="quiz-opt" data-a="1">動畫師（In-Betweener）</button>
+        <button class="quiz-opt" data-a="2">分鏡師（Storyboard Artist）</button>
+        <button class="quiz-opt" data-a="3">背景師（Background Artist）</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="5">
+      <div class="quiz-q">6. 哪一年 Stable Diffusion、MidJourney、DALL·E 2 相繼推出，AI 繪圖進入大眾化時代？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">2019 年</button>
+        <button class="quiz-opt" data-a="1">2021 年</button>
+        <button class="quiz-opt" data-a="2">2022 年</button>
+        <button class="quiz-opt" data-a="3">2024 年</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="6">
+      <div class="quiz-q">7. 以下哪個 AI 工具主要用於「音樂生成」？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">ElevenLabs</button>
+        <button class="quiz-opt" data-a="1">Runway Gen-4</button>
+        <button class="quiz-opt" data-a="2">Suno AI</button>
+        <button class="quiz-opt" data-a="3">Midjourney</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-card" data-q="7">
+      <div class="quiz-q">8. 向量圖的最大優點是？</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-a="0">色彩層次豐富，支援攝影級細節</button>
+        <button class="quiz-opt" data-a="1">縮放時不會失真，適合 Logo 設計</button>
+        <button class="quiz-opt" data-a="2">檔案容量小，適合網路傳輸</button>
+        <button class="quiz-opt" data-a="3">支援透明背景，適合網頁設計</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+  </div>
+
+  <button id="submit-quiz" onclick="submitQuiz()">📊 查看成績</button>
+  <div class="quiz-score" id="quiz-score">
+    <h3 id="score-text"></h3>
+    <p id="score-detail" style="margin-top:0.5rem; opacity:0.9;"></p>
+  </div>
+</div>
+
+<script>
+const answers = [1, 2, 1, 2, 1, 2, 2, 1];
+const explanations = [
+  "正確！Scott McCloud 定義漫畫為「連續藝術（Sequential Art）」。",
+  "正確！24 bit = 2²⁴ = 16,777,216 種顏色（全彩）。",
+  "正確！PNG 支援透明背景且為無損壓縮格式，不會失真。",
+  "正確！NTSC 標準為每秒 30 個畫格（30 fps）。",
+  "正確！動畫師（In-Betweener）負責補充中間畫格。",
+  "正確！2022 年是 AI 繪圖大眾化的關鍵年份。",
+  "正確！Suno AI 是專門的 AI 音樂生成工具。",
+  "正確！向量圖可無限縮放不失真，非常適合 Logo 設計。"
+];
+const wrongs = [
+  "不對！正確答案是「連續藝術（Sequential Art）」。",
+  "不對！24 bit = 2²⁴ = 16,777,216 色。",
+  "不對！JPG 不支援透明背景；GIF 雖支援透明但限 256 色；BMP 無透明支援。PNG 才是正確答案。",
+  "不對！NTSC 是 30 fps，PAL 才是 25 fps。",
+  "不對！補中間畫是「動畫師（In-Betweener）」的工作。",
+  "不對！Stable Diffusion、MidJourney 是 2022 年推出的。",
+  "不對！ElevenLabs 是語音合成，Suno AI 才是音樂生成。",
+  "不對！縮放不失真是向量圖的特性；透明背景是 PNG 的特性。"
+];
+
+let answered = new Array(8).fill(false);
+let userAnswers = new Array(8).fill(-1);
+
+document.querySelectorAll('.quiz-opt').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const card = this.closest('.quiz-card');
+    const q = parseInt(card.dataset.q);
+    if (answered[q]) return;
+    answered[q] = true;
+    userAnswers[q] = parseInt(this.dataset.a);
+    const opts = card.querySelectorAll('.quiz-opt');
+    opts.forEach(o => o.disabled = true);
+    const fb = card.querySelector('.quiz-feedback');
+    if (parseInt(this.dataset.a) === answers[q]) {
+      this.classList.add('correct');
+      fb.textContent = '✅ ' + explanations[q];
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      this.classList.add('wrong');
+      opts[answers[q]].classList.add('correct');
+      fb.textContent = '❌ ' + wrongs[q];
+      fb.className = 'quiz-feedback show no';
+    }
+  });
+});
+
+function submitQuiz() {
+  let score = 0;
+  userAnswers.forEach((a, i) => { if (a === answers[i]) score++; });
+  const el = document.getElementById('quiz-score');
+  document.getElementById('score-text').textContent = `🎉 你得了 ${score} / 8 分`;
+  const msg = score >= 7 ? '太棒了！掌握度極佳！' : score >= 5 ? '不錯！繼續加油！' : '建議再複習一遍講義喔！';
+  document.getElementById('score-detail').textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth'});
+}
+
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs = ['ch1','ch2','ch3','ai','quiz'];
+  const idx = tabs.indexOf(id);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  window.scrollTo({top: 120, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
